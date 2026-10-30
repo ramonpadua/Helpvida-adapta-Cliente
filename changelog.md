@@ -1,5 +1,9 @@
 # Changelog — Help Vida
 
+## 2026-10-30
+
+- 2026-10-30 · Fernando/TI · Task F1-T01 concluída: teste humano aprovado pelo champion ("está tudo de acordo"); revalidação independente confirmou migrações 0001/0002 aplicadas, regras de acesso e hooks de RBAC/auditoria intactos e prévia renderizando login (v0.0.7). Evidências: painel admin + logs do projeto Skip "Novo Projeto" (56877).
+
 ## 2026-09-15
 
 - 2026-09-15 · Fernando/TI · F1-T01: implementação restrita concluída no projeto Skip "Novo Projeto" (versão 0.0.5); migrações `0001_hv_access_control` e `0002_hv_harden_user_access` aplicadas; QA oficial passou em setup, análise estática, build, integrações e teste; teste humano ainda pendente.
