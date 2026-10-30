@@ -3,6 +3,8 @@
 ## 2026-10-30
 
 - 2026-10-30 · Fernando/TI · Task F1-T01 concluída: teste humano aprovado pelo champion ("está tudo de acordo"); revalidação independente confirmou migrações 0001/0002 aplicadas, regras de acesso e hooks de RBAC/auditoria intactos e prévia renderizando login (v0.0.7). Evidências: painel admin + logs do projeto Skip "Novo Projeto" (56877).
+- 2026-10-30 · Fernando/TI · Paleta da marca Help Vida aplicada ao tema (v0.0.8): tokens em `src/main.css` e `tailwind.config.ts` reancorados na logo oficial (verde escuro #06301F, teal #128A68, verde claro #6FC7AE, amarelo #D3B308, fundo #F4F6F5); QA passou em setup, análise estática, build e integrações; prévia confere as cores na tela de login. Sem alteração de regra, dado ou hook.
+- 2026-10-30 · Fernando/TI · Emenda E-1 proposta na SPEC-1-002: contrato `B-ARQ-01` passa a modelar lote de N páginas por ocorrência (mínimo proposto de 20), com página indexada, hash e qualidade próprios. **Aguardando homologação de Fernando/TI** — nenhum valor implementado.
 
 ## 2026-09-15
 
