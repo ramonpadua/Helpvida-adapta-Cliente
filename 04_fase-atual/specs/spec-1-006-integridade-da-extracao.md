@@ -34,3 +34,8 @@ Nenhuma chamada de visão/serviço novo, publicação ou dado real. Se correçã
 
 ## Permissões desta correção
 Não ampliar acesso atual durante T11: limitar prova a fixture isolada, aplicação só após autorização. Guard mínimo da rota exige papel e escopo autorizado na ocorrência; se isso exigir migração da matriz, desligar extração automática e encaminhar a T02 antes de reativar. Regressão das novas coleções fica T02, não reabre T01.
+
+
+## Guia operacional e verificação do agente
+
+Siga `GUIA-CONTINUAR-PROJETO.md` na raiz. Confirmar instalação da migration 0005 e slug `leitor-prontuarios-helpvida` no ambiente cliente antes de alegar agente operacional. Já existe declaração no código; não criar duplicado. Acesso externo a 56877 retornou Project not found. Explicar antes da correção e fornecer link real da prévia, papel, botões e retorno esperado conforme o guia. T11 resolve integridade/fallback; ligação de visão real somente se documentada e autorizada, nunca por campo image_url suposto. Caso contrário: manual explícito e T06 continua bloqueada.

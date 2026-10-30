@@ -8,3 +8,11 @@ Antes de alterar qualquer coisa:
 2. leia critérios, pré-condições, ponto de parada e TDD da SPEC;
 3. interrompa diante de bloqueio não resolvido;
 4. mantenha dado real, IA externa e scraping desativados sem os respectivos gates.
+
+
+## Retomada guiada após alinhamento SES
+
+Ao receber “vamos continuar o projeto”, leia `GUIA-CONTINUAR-PROJETO.md`, `STATUS.md` e a SPEC da próxima task. Explique o que já existe, o que falta, a correção exata e como Fernando fará o teste em tela. Começar pela candidata T11; não refazer T01 nem criar agente duplicado. Fluxo SES entregue incorporado, não cobrar novamente. Não prometer visão/OCR comprovados só porque existe agente. Uma autorização e um teste humano por task.
+
+Repo operacional: https://github.com/ramonpadua/Helpvida-adapta-Cliente
+Código do sistema: https://github.com/FernandoHelpVida/Prescri-o-SES (submódulo `07-sistemas/Prescri-o-SES`).
