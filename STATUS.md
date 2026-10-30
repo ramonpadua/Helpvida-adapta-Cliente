@@ -1,8 +1,12 @@
 # STATUS — Help Vida
 
-- **Fase atual:** Fase 1 — origem, extração assistida, conferência e pré-preenchimento.
-- **Tasks:** F1-T01 concluída (30/10/2026); F1-T02..F1-T10 aguardando precedentes/gates — 1 de 10 concluída (10%).
-- **Task Ativa / Candidata:** Nenhuma ativa; próxima elegível `F1-T02` (dependência de F1-T01 satisfeita), sujeita a seleção e autorização.
-- **Bloqueio imediato:** Nenhum para F1-T02; gates B-ARQ-01, B-IA-01, B-TEMPLATE-01, B-METRICA-01, B-SCRAPE-01/02 e B-SECRET-01 seguem fechados para suas tasks.
-- **Regra:** uma task por vez, TDD da SPEC e teste humano antes da próxima.
-- **Limites:** sem dado real, IA externa ou scraping antes dos gates próprios.
+- **Fase:** F1 — captura e conferência SES; emenda E-F1-20261030-02.
+- **Concluída:** F1-T01, teste humano aprovado 30/10 11:57. Preservado, sem reabrir.
+- **Tasks:** 1 aceita, 12 abertas (inclui implementações parciais), 2 suspensas T09/T10; total 15. Suspensa não equivale a concluída.
+- **Próxima candidata:** F1-T11, corrigir falso sucesso da leitura; aguarda autorização e teste humano próprios. Nenhuma task de código executada nesta atualização documental.
+- **Já construído:** tela/tema, paciente antes, cadastro, upload de arquivo único, fila, cards, agente e hooks (v0.0.10). Reusar; não reconstruir.
+- **Bloqueio crítico:** hook manda só filename/cadastro e inventa valores em fallback; leitura de imagem/PDF NÃO provada.
+- **Sequência principal:** T11 → T02 → T03 → T04 → T05; depois provas externas T12/T14 e integrações T13/T15 conforme gates; T06 visão condicionada; T07→T08 saída SES/medição com modo manual homologado possível. Uma por vez.
+- **Pendências cliente:** fluxo SES corrigido e formato final; limites completos de arquivo/lote; autorização/política de dados; destino/perfis/retencão SharePoint; documentação/autenticação da API de consulta e regras por autorização de paciente para fase posterior. Não perguntar de novo o que call já respondeu.
+- **Gates:** sem dado real antes B-DADOS-01; sem visão externa sem decisão; local só estudo; sync 03h só foi relatado no outro app. Check-escopo/check-cliente 08/09 estão APROVADOS (corrige relato anterior de pendente).
+- **Fontes:** call 30/10; raiz 8fe6477; código 41df705; prompts do dia como intenção. Existência de migration/agente ou build passando não aprova task.

@@ -107,12 +107,28 @@ Em ambiente autorizado, três contas de teste demonstram que cada papel vê e al
 
 ## Tasks vinculadas
 
-| ID | Task | Dono | SPEC | Critério | Recorte da prova | Evidência esperada | Pré-condições | Status |
-|---|---|---|---|---|---|---|---|---|
-| F1-T01 | Configurar papéis, negação por padrão e trilha sintética | Fernando/TI | SPEC-1-001 | CA-1-001..004 | Executar primeiro o RED da matriz não aplicada; depois aplicar a matriz com Operador, Conferente e Admin e provar ações permitidas/negadas e eventos sanitizados | resultado da suíte + log sanitizado + matriz aplicada | B-ENV-01 resolvido; ambiente/repositório autorizados; FIX sintética revisada | Bloqueada — B-ENV-01 |
-| F1-T02 | Provar expiração da fixture e bloqueio de dado real | Fernando/TI | SPEC-1-001 | CA-1-005..006 | Expirar/excluir fixture e tentar ingestão marcada como real sem B-DADOS-01 | prova de remoção + teste de recusa + inspeção de logs | F1-T01 aceita; fixture revisada conforme checklist da SPEC-1-001 | Bloqueada — depende F1-T01 |
+| ID | Task | Dono | SPEC | Critério | Subseção exata | Recorte da prova | Evidência esperada | Pré-condições | Ponto de parada | Estado final | Leva | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1-T01 | Configurar papéis, negação por padrão e trilha sintética | Fernando/TI | SPEC-1-001 | CA-1-001..004 | Dados e permissões; Fluxo e regras; TDD RED→GREEN | Executar primeiro o RED da matriz não aplicada; depois aplicar a matriz com Operador, Conferente e Admin e provar ações permitidas/negadas e eventos sanitizados | resultado da suíte + log sanitizado + matriz aplicada | B-ENV-01 resolvido; ambiente/repositório autorizados; FIX sintética revisada | parar antes de dado real, permissão fora da matriz ou acesso de suporte sem autorização temporal | RBAC e auditoria funcionais com fixture; nenhuma permissão implícita | 1 | Concluída — 2026-10-30 (teste humano aprovado) |
+| F1-T02 | Ajustar e provar acesso seguro, expiração de testes e bloqueio de dado real no fluxo novo | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-001 | CA-1-005..006; CA-HV-045..047 | Emenda E-F1-20261030 — T02; TDD | Tentar leitura/alteração direta e via hook com operador/conferente/suporte sem escopo; tentar confirmar vazio e sobrescrever revisão; expirar fixture sintética | matriz de negações + regressão RBAC + prova de expiração em ambiente de teste | T11 aceita; autorização; fixture aprovada | parar se acesso indevido persistir ou houver dado real; nunca apagar arquivos do Drive | novas coleções protegidas sem desfazer T01 | 3 | Aberta — depende de T11; não repetir implementação da T01 |
 
 ## Emendas
 
 | Data | Origem do sinal | Micro-spec/task | Motivo |
 |---|---|---|---|
+
+## Emenda E-F1-20261030-02 — continuidade a partir do código
+
+**Origem:** 3°_call.md (30/10), prompts do consultor aplicados diretamente no Skip e pedido expresso de ajustar as tarefas. Esta seção prevalece apenas nos pontos conflitantes do contrato anterior; preserva histórico, aceites e IDs.
+**Degrau:** reuso do app React/PocketBase existente; não recriar o sistema nem assumir que publicar agente comprova OCR.
+### Emenda E-F1-20261030 — T02
+T01 está aceita em 30/10 11:57 (fonte raiz commit 6c11af2..b1cee1c). Não reabrir T01. Migração 0003 criou coleções novas com leitura ampla e update autenticado; essa superfície NÃO está homologada pelo aceite anterior.
+T02 mantém CA-1-005/006 e cobre as novas coleções `clientes`, `ocorrencias`, `extracoes`, os arquivos protegidos e os hooks `hv_extrair_prontuario`/`hv_confirmar_dados`.
+- **CA-HV-045:** negação por padrão também na API direta/arquivo; operador só cria no escopo permitido e não altera status, campos finais, responsável ou extrações. Conferente só consulta e confirma itens do escopo autorizado. Admin gerencia conforme matriz; suporte somente com concessão temporal existente.
+- **CA-HV-046:** confirmar requer estado válido, obrigatórios revisados e trilha; nova tentativa não sobrescreve silenciosamente uma revisão aprovada; o operador não burla UI via CRUD/hook.
+- **CA-HV-047:** guards sintéticos e expiração verificáveis no fluxo novo; nunca excluir arquivo do Drive. Provas de descarte somente fixtures no ambiente de teste autorizado.
+**TDD adicional:** RED por perfis em API e hook; GREEN negar fora da matriz; REGRESSÃO expiração e revogação de suporte sem mudar T01. Guardar resultados sanitizados, não token/conteúdo clínico. Falha mantém T02 aberta.
+
+
+### Recorte de implementação T02
+Reusar papéis e concessões temporais da 0001/0002. Introduzir migração corretiva não destrutiva para 0003; não editar migração aplicada nem excluir registros. Bloquear update direto de status/campos finais/responsável pelo operador; confirmação via hook verificado por papel e escopo; arquivos protegidos com autorização equivalente à ocorrência. Criar/read/update de clientes conforme matriz (admin gerencia; operador consulta e cria para captura autorizada; conferente consulta somente o necessário; suporte só concessão temporal). Definir escopo nominal do piloto com Fernando antes de ampliar para real; até lá fixture isolada. Não redefinir o aceite T01. Rodar provas de CRUD direto e hooks com usuários sintéticos de cada papel.

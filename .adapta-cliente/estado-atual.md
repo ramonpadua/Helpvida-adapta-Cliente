@@ -11,3 +11,11 @@
 - ultima_acao: revalidação independente (migrações, regras, hooks, prévia) + fechamento em fase.md, STATUS.md e changelog.md
 - proxima_acao: nenhuma — task concluída; próxima task exige novo ciclo de análise e autorização
 - atualizado_em: 2026-10-30T12:10:00-03:00
+
+## Continuidade documental — E-F1-20261030-02
+
+- F1-T01 permanece concluída; trecho de aceite acima preservado.
+- Nenhuma nova task implementada ou aceita nesta atualização.
+- Próxima candidata: F1-T11 (SPEC-1-006), retirar fallback inventado da extração.
+- Exige autorização individual e teste humano; código de sistema 41df705 somente inspecionado.
+- Em seguida: T02 → T03 → T04 → T05; integrações guarda/pacientes e PoC condicionais conforme fase.md.

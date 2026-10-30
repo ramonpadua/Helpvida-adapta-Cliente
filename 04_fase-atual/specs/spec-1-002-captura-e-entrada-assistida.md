@@ -112,10 +112,10 @@ Em dispositivo de teste, um operador cria ocorrência em até um fluxo contínuo
 
 ## Tasks vinculadas
 
-| ID | Task | Dono | SPEC | Critério | Recorte da prova | Evidência esperada | Pré-condições | Status |
-|---|---|---|---|---|---|---|---|---|
-| F1-T03 | Implementar entrada assistida com protocolo e fila | Fernando/TI | SPEC-1-002 | CA-1-007..009 | Executar FIX-01 e FIX-04 mais cenário com obrigatório vazio: criar uma ocorrência, rejeitar obrigatório/arquivo inválido e localizar um único protocolo na fila | capturas sanitizadas + protocolo + evento de auditoria + teste | F1-T01 aceita; B-ARQ-01 homologado; usar exclusivamente recorte sintético até B-PILOTO-01 e B-DADOS-01 | Bloqueada — F1-T01 concluída; depende de B-ARQ-01 (emenda E-1) e recorte sintético |
-| F1-T04 | Provar baixa qualidade, retry, duplicidade e fallback de captura | Fernando/TI | SPEC-1-002 | CA-1-010..012 | Executar FIX-02/FIX-05, timeout e captura indisponível; repetir confirmação com mesma chave | relatório de regressão + protocolos reconciliados + prova de ausência/remoção de rascunho | F1-T03 aceita; dispositivo-alvo de teste disponível | Bloqueada — depende F1-T03 |
+| ID | Task | Dono | SPEC | Critério | Subseção exata | Recorte da prova | Evidência esperada | Pré-condições | Ponto de parada | Estado final | Leva | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1-T03 | Completar a tela já criada para paciente e lote semanal de fotos SES | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-002 | CA-1-007..009; CA-1-031..032; CA-HV-048 | Emenda E-F1-20261030 — lote SES; TDD | Reusar tela/tema/cadastro; provar paciente antes; 20 páginas sintéticas no mesmo lote, protocolo único e estados por página | lote sintético + fila + hashes/índices + teste das supervisoras | T02 aceita; B-ARQ-01 complementado; sintético | não recriar tela nem exigir sempre 20 fotos; não inventar limite total/armazenamento real | captura em lote rastreável sem perder fluxo existente | 4 | Parcial implementada — upload atual aceita 1 arquivo; falta lote e homologação |
+| F1-T04 | Testar o lote com foto ruim, repetida, falha de rede e PDF | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-002 | CA-1-010..012; CA-1-032 | Emenda E-F1-20261030 — bordas; TDD | Foto ruim só afeta sua página; retry não duplica; mesmo hash sinalizado; PDF digital vs escaneado com resultado honesto | relatório por página + teste de retry e ausência de cópia local oculta | T03 aceita; contrato arquivos homologado | parar se duplicar, confirmar envio perdido ou declarar PDF escaneado lido sem OCR | lote recuperável com conferência manual | 5 | Aberta — depende de T03 |
 
 ## Emenda E-1 — Contrato `B-ARQ-01`: lote de páginas por ocorrência (PROPOSTA)
 
@@ -176,3 +176,20 @@ Os critérios `CA-1-007..012` permanecem válidos e passam a ser avaliados **no 
 | Data | Origem do sinal | Micro-spec/task | Motivo |
 |---|---|---|---|
 | 2026-10-30 | Requisito do cliente: mínimo de 20 fotos de prontuário por paciente, com nome do paciente antes do anexo | E-1 / F1-T03 | SPEC modela 1 artefato por ocorrência; processo real exige lote de páginas indexadas. Proposta de `B-ARQ-01` aguardando homologação de Fernando/TI |
+
+## Emenda E-F1-20261030-02 — continuidade a partir do código
+
+**Origem:** 3°_call.md (30/10), prompts do consultor aplicados diretamente no Skip e pedido expresso de ajustar as tarefas. Esta seção prevalece apenas nos pontos conflitantes do contrato anterior; preserva histórico, aceites e IDs.
+**Degrau:** reuso do app React/PocketBase existente; não recriar o sistema nem assumir que publicar agente comprova OCR.
+### Emenda E-F1-20261030 — lote SES
+O código já possui `AnexarProntuario.tsx`, `NovoClienteModal.tsx`, fila e coleção `ocorrencias`. Reutilizar. Hoje `foto.maxSelect=1` e a UI usa `files[0]`: lote ainda NÃO existe.
+**Entrada principal:** paciente pré-cadastrado/selecionado → visita semanal → lote de páginas da semana → prévia → protocolo → fila. Cada visita preserva seu lote/período e contribui para a mesma competência do paciente; não esperar o fechamento mensal nem sobrescrever lotes anteriores. Recorte SES, não Unimed. Piloto controlado de cinco casas permanece; universo 100–120 da call é expansão desejada, não aceite de produção.
+**Contrato:** suportar pelo menos 20 fotos por paciente/lote conforme 24:32. Isso NÃO é máximo de 20, nem obrigação de fotografar exatamente 20; lotes menores podem corresponder ao material disponível. A condição abaixo do mínimo da proposta E-1 permanece NÃO homologada; não classificar falta só por contagem fixa. Completar B-ARQ-01 com máximo páginas/lote, tipos, bytes/lote e arquivo, resolução e tratamento PDF. Os 10MB do código são estado atual, não limite operacional aceito.
+**Dados:** manter ocorrência/protocolo; páginas em relação filha com `occurrence_id`, índice, tipo, hash, qualidade, identificador de arquivo e timestamp. Contrato lógico não obriga nome físico de nova coleção; executor confirma mapeamento em análise antes de implementar. Migração deve preservar ocorrências antigas como página única, sem apagar origem.
+**CA-1-031 (revisado):** lote menor que capacidade 20 não é rejeitado arbitrariamente; incompletude depende de declaração/critério homologado. **CA-1-032:** índice/hash/qualidade por página, rastreio até evolução. **CA-HV-048:** paciente antes do anexo (UI e servidor), 20 páginas sintéticas sob mesmo protocolo, sem perda/mescla com outro paciente.
+**TDD T03:** RED comprovar 1 arquivo atual; GREEN lote 20 + fila + paciente obrigatório; REGRESSÃO abrir ocorrências antigas. **TDD T04:** página ilegível, duplicada, timeout, retry idempotente, PDF com texto e PDF imagem. Upload aceito não comprova leitura; PDF escaneado sem OCR fica pendente/manual.
+**Parada:** contrato de arquivo incompleto, persistência local sem proteção, dado real sem política. SharePoint é guarda definida em SPEC-1-007, não integrar por inferência nesta task.
+
+
+### Gate de detalhamento da T03
+Antes de implementar lote, registrar análise com mapeamento aprovado de coleção/campos/relações, migração legada, chave de idempotência e limites homologados. Sem esse contrato aprovado, T03 fica bloqueada; executor não escolhe armazenamento/modelagem nova por conta própria. A tarefa reaproveita código, não autoriza arquitetura por inferência.

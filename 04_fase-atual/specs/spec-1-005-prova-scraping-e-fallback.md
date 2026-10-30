@@ -107,12 +107,21 @@ Com fonte de teste autorizada, uma execução cria lote identificado e reconcili
 
 ## Tasks vinculadas
 
-| ID | Task | Dono | SPEC | Critério | Recorte da prova | Evidência esperada | Pré-condições | Status |
-|---|---|---|---|---|---|---|---|---|
-| F1-T09 | Validar gate e executar canário autorizado do scraping | Fernando/TI | SPEC-1-005 | CA-1-025..026, CA-1-030 | Provar recusa sem contrato; depois executar canário read-only autorizado e scan de segredo | recibo dos gates + relatório canário + scan limpo + prova de ausência de escrita/envio | Independente de F1-T01 por usar canário isolado; B-SCRAPE-01/02, B-SECRET-01 e B-ENV-01 resolvidos; B-DADOS-01 se dado real | Bloqueada — gates de scraping/segredo |
-| F1-T10 | Provar quebra detectável, retry limitado e reconciliação com fallback | Fernando/TI | SPEC-1-005 | CA-1-027..029 | Em fixtures, simular mudança estrutural, timeout e 401/403/429/CAPTCHA/MFA; reconciliar item já criado pelo fallback FIX-05. Ocorrência real desses códigos pertence ao ponto de parada de F1-T09 | relatório de resiliência + alerta/quarentena + reconciliação + kill switch | F1-T04 e F1-T09 aceitas; contrato de retry/frequência homologado | Bloqueada — depende F1-T04/F1-T09 |
+| ID | Task | Dono | SPEC | Critério | Subseção exata | Recorte da prova | Evidência esperada | Pré-condições | Ponto de parada | Estado final | Leva | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1-T09 | Prova de scraping legada — suspensa para priorizar captura SES | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-005 | CA-1-025..026; CA-1-030 | Emenda E-F1-20261030 — suspensão | Nenhum scraping agora; retomada só com decisão, permissão e contrato próprios | registro da suspensão sem marcar conclusão | nova autorização de retomada | não executar nem exigir credenciais agora | histórico preservado; não bloqueia piloto foto SES | — | Suspensa — não concluída; fora da sequência ativa |
+| F1-T10 | Resiliência de scraping legada — suspensa com o canário | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-005 | CA-1-027..029 | Emenda E-F1-20261030 — suspensão | Nenhum retry de scraping; não substituir API consulta por scraping | registro da suspensão | retomada T09 + T04 aceita | não contornar CAPTCHA/MFA nem integrar por inferência | histórico preservado | — | Suspensa — não concluída; fora da sequência ativa |
 
 ## Emendas
 
 | Data | Origem do sinal | Micro-spec/task | Motivo |
 |---|---|---|---|
+
+## Emenda E-F1-20261030-02 — continuidade a partir do código
+
+**Origem:** 3°_call.md (30/10), prompts do consultor aplicados diretamente no Skip e pedido expresso de ajustar as tarefas. Esta seção prevalece apenas nos pontos conflitantes do contrato anterior; preserva histórico, aceites e IDs.
+**Degrau:** reuso do app React/PocketBase existente; não recriar o sistema nem assumir que publicar agente comprova OCR.
+### Emenda E-F1-20261030 — suspensão
+T09/T10 ficam SUSPENSAS, não concluídas. A call estabelece fotos SES como entrada e API de consulta para cadastro como possibilidade separada. Scraping não é pré-requisito do piloto de imagem e não pode ser executado como substituto da API.
+Contrato/CA legados preservados como histórico; só retomam com decisão explícita de fonte, permissão, segredo e nova priorização. O fechamento do incremento ativo não depende de executar scraping suspenso, mas exige registrar o destino da suspensão.
+

@@ -112,12 +112,28 @@ Conferente abre ocorrência sintética, vê imagem e campos sugeridos lado a lad
 
 ## Tasks vinculadas
 
-| ID | Task | Dono | SPEC | Critério | Recorte da prova | Evidência esperada | Pré-condições | Status |
-|---|---|---|---|---|---|---|---|---|
-| F1-T05 | Implementar Estágio A simulado de extração e conferência | Fernando/TI | SPEC-1-003 | CA-1-013..017 | Processar FIX-01/02/03/06 com adaptador determinístico; verificar source_ref e extractor_version por campo; revisar, corrigir, bloquear obrigatório ausente e simular timeout | suíte do simulador + trilha sugerido→final + demonstração de modo manual | F1-T01 e F1-T03 aceitas; dicionário B-TEMPLATE-01 homologado para campos sintéticos | Bloqueada — depende F1-T01/F1-T03 e dicionário |
-| F1-T06 | Executar PoC autorizada do motor de extração | Fernando/TI | SPEC-1-003 | CA-1-018 | Repetir suíte do Estágio A no motor aprovado e medir amostra, acerto/correção por campo, falhas, duração e custo | relatório PoC reproduzível + versão/config + aceite Auditoria/Faturamento | F1-T05 aceita; B-IA-01 resolvido; B-DADOS-01 se amostra real; orçamento/quota definidos | Bloqueada — depende F1-T05 e B-IA-01 |
+| ID | Task | Dono | SPEC | Critério | Subseção exata | Recorte da prova | Evidência esperada | Pré-condições | Ponto de parada | Estado final | Leva | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1-T05 | Validar a conferência dos campos do paciente e de cada evolução | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-003 | CA-1-013..017; CA-HV-049..051 | Emenda E-F1-20261030 — contrato SES; TDD Estágio A | Fixture declarada como simulação: nome/data/carimbo/assinatura, nome+registro+categoria legíveis; várias evoluções/página; divergência de paciente; null vs ausente | resultado sugerido vs final + origem página/região + quem revisou + teste humano | T04 aceita; T11/T02 aceitas | não criar diagnóstico nem atribuir identidade por rubrica; não marcar dado sugerido como definitivo | conferência reutiliza cards e agente existentes, sem aceitar simulação como leitura | 6 | Parcial implementada — cards/agente existem; validação e múltiplas evoluções pendentes |
+| F1-T06 | Provar leitura real de imagem e PDF antes de dizer que a IA funciona | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-003 | CA-1-018; CA-HV-052 | Emenda E-F1-20261030 — Estágio B; TDD | Provar conteúdo recebido pelo motor, não filename; variar imagem com cadastro fixo; medir por campo e página; erro vai ao manual | PoC reproduzível com versão/custo/limites + aceite operacional | T05 aceita; B-IA-01 resolvido; sintético até B-DADOS-01 | se Skip não suportar visão, registrar bloqueio; não tentar aliases como solução nem ligar provedor sem decisão | leitura comprovada OU bloqueio explícito, nunca falso sucesso | 10 | Bloqueada — visão/OCR não demonstrados; existência do agente não comprova leitura |
 
 ## Emendas
 
 | Data | Origem do sinal | Micro-spec/task | Motivo |
 |---|---|---|---|
+
+## Emenda E-F1-20261030-02 — continuidade a partir do código
+
+**Origem:** 3°_call.md (30/10), prompts do consultor aplicados diretamente no Skip e pedido expresso de ajustar as tarefas. Esta seção prevalece apenas nos pontos conflitantes do contrato anterior; preserva histórico, aceites e IDs.
+**Degrau:** reuso do app React/PocketBase existente; não recriar o sistema nem assumir que publicar agente comprova OCR.
+### Emenda E-F1-20261030 — contrato SES
+Reusar agente `leitor-prontuarios-helpvida`, hook `hv_extrair_prontuario.js`, cards e `hv_confirmar_dados.js`. A implementação atual manda apenas filename+cadastro e usa fallback com valores fixos: não há prova de leitura. Tratar integridade em T11 (SPEC-1-006), não recriar agente para mascarar a falha.
+**Campos homologados (45:46–48:36):** nome do paciente; data de CADA evolução; nome/registro e categoria profissional quando legíveis no carimbo/identificação; presença/legibilidade de carimbo e assinatura. Categorias citadas: fisioterapia, fonoaudiologia, técnico de enfermagem, enfermagem, médico (outros somente se legíveis). Não extrair narrativa clínica, medicamentos, materiais ou CID por padrão.
+**Contrato por evolução:** `page_id`, `evolution_index`, campo→`value/found/confidence/source`, `professional_category` legível ou null, `extractor_version`, execução e revisão. Uma página pode conter várias evoluções/datas/profissionais; não reduzir o lote a um único objeto. Valor sugerido separado de valor final; booleans de presença aceitam desconhecido/null para imagem não examinada. Rótulo confiança não é probabilidade calibrada.
+- **CA-HV-049:** paciente escolhido x paciente transcrito divergentes gera pendência; cadastro não substitui leitura nem corrige silenciosamente o documento.
+- **CA-HV-050:** preservar várias evoluções por página e suas datas/profissionais; rubrica não autentica autoria; não deduzir categoria por nome/CRM sem base legível homologada.
+- **CA-HV-051:** obrigatórios conferidos individualmente, correções com autor/data/motivo e origem clicável por página. Ilegível/ausente deve ficar explícito, não dado inventado.
+- **CA-HV-052:** PoC comprova que motor recebeu conteúdo visual/OCR de cada página, não só nome/URL; sem isso nenhum caso é sucesso de leitura.
+**Estágio A / T05:** fixture determinística rotulada SIMULAÇÃO; não apresentar demo como IA lendo. Modo manual sempre disponível, inclusive se não existir linha em extracoes. **Estágio B / T06:** testar imagem/handwriting e PDF scan só com visão/OCR documentado e autorizado; Skip text-only não vira visão pela troca fast→reasoning. PDF digital pode converter texto, sem garantir leitura visual de carimbo/assinatura. Contrato B-IA-01 define capacidade, custo/créditos, quota/retencão/região e limites. Não usar provedor externo nem SDK/chave por iniciativa do executor.
+**TDD:** RED cadastro igual+imagem diferente, ausência de data, carimbo ilegível, assinatura isolada, duas evoluções em uma página; GREEN origem real e revisão; REGRESSÃO timeout, JSON inválido, mesma execution_key sem nova cobrança, reprocessamento não sobrescreve revisão. PoC reporta acerto/correções por campo e por página, custo e falhas; aceite é de auditoria, não uma migration chamada test (0006 é no-op).
+

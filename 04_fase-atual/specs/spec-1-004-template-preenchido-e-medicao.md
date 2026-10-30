@@ -101,12 +101,24 @@ Uma ocorrência integralmente conferida gera um template marcado como pré-preen
 
 ## Tasks vinculadas
 
-| ID | Task | Dono | SPEC | Critério | Recorte da prova | Evidência esperada | Pré-condições | Status |
-|---|---|---|---|---|---|---|---|---|
-| F1-T07 | Gerar template versionado com manifesto e aprovação interna | Fernando/TI | SPEC-1-004 | CA-1-019..023 | Gerar FIX-01, comparar campo a campo, remover obrigatório em FIX-03, testar formato inválido e trocar versão; devolver, regenerar e provar marca NÃO ENVIADO | diff esperado×gerado + manifesto + versões + aceite Auditoria/Faturamento | F1-T05 aceita; B-TEMPLATE-01 e B-PILOTO-01 resolvidos | Bloqueada — depende F1-T05 e template |
-| F1-T08 | Instrumentar e provar comparação manual versus sistema | Fernando/TI | SPEC-1-004 | CA-1-024 | Registrar relógios equivalentes, gerar relatório e testar mistura de coortes/períodos | relatório com baseline, resultado, volume, limitações + teste de incomparabilidade | F1-T07 aceita; B-METRICA-01 resolvido; coorte/janela/fontes/owner homologados | Bloqueada — depende F1-T07 e B-METRICA-01 |
+| ID | Task | Dono | SPEC | Critério | Subseção exata | Recorte da prova | Evidência esperada | Pré-condições | Ponto de parada | Estado final | Leva | Status |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| F1-T07 | Homologar a ficha SES e gerar a saída conferida sem envio externo | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-004 | CA-1-019..023; CA-HV-053 | Emenda E-F1-20261030 — saída SES; TDD | Receber fluxo SES corrigido; aprovar formato com auditoria; gerar por paciente/período com evoluções validadas, sem dupla contagem | modelo SES versionado + comparação campo a campo + manifesto NÃO ENVIADO | T05 aceita; B-TEMPLATE-01 SES e B-PILOTO-01 resolvidos; manual possível | não usar template Unimed por padrão; não decidir cobrança/pagamento | saída SES aprovada internamente; modo manual independente da PoC | 11 | Bloqueada — fluxo SES corrigido/modelo faltam; não recriar modelo por suposição |
+| F1-T08 | Comparar tempo e retrabalho do piloto SES com o processo manual | Fernando/TI; aceite Auditoria/Faturamento | SPEC-1-004 | CA-1-024 | Dados e métricas; Emenda E-F1-20261030; TDD | Comparar mesma coorte/janela e origem→aprovação; separar manual/automático e volume por página/evolução | baseline + resultado + volume + limitações + decisão de expansão | T07 aceita; B-METRICA-01 homologado; real só após política | não converter desejo 14→10 em meta nem prometer novo prazo sem capacidade | ganho auditável ou ausência de ganho explicitada | 12 | Aberta — depende de T07 e baseline |
 
 ## Emendas
 
 | Data | Origem do sinal | Micro-spec/task | Motivo |
 |---|---|---|---|
+
+## Emenda E-F1-20261030-02 — continuidade a partir do código
+
+**Origem:** 3°_call.md (30/10), prompts do consultor aplicados diretamente no Skip e pedido expresso de ajustar as tarefas. Esta seção prevalece apenas nos pontos conflitantes do contrato anterior; preserva histórico, aceites e IDs.
+**Degrau:** reuso do app React/PocketBase existente; não recriar o sistema nem assumir que publicar agente comprova OCR.
+### Emenda E-F1-20261030 — saída SES
+O recorte prioritário é SES/Secretaria de Estado de Saúde, não formulário Unimed (04:58–06:44;56:35–01:00:12). Fonte de entrada é foto/lote, não scraping obrigatório.
+**CA-HV-053:** Auditoria homologa formato SES versionado a partir do fluxo corrigido prometido na call; a saída relaciona paciente, período e evoluções efetivamente conferidas com data/profissional/categoria e origem. Contagem é de registros de evolução validados, NÃO de fotos; não tratar contagem como terapia paga ou falta clínica automaticamente. Não inventar formato oficial SES nem converter o modelo Unimed em aceite.
+T07 reusa campos e fila; fluxo corrigido/modelo são B-TEMPLATE-01. Testar duas evoluções/página, mesma evolução reapresentada sem dupla contagem conforme chave homologada e origem ausente impedindo confirmação.
+As regras de frequência variam por autorização/paciente (48:37–50:24); colher com auditoria durante homologação os exemplos, vigência, frequência/unidade, exceções e quem valida, para a F2. Não aplicar mínimo global de fisio/fono nem implementar motor de pendências nesta F1. Faturamento SES em pacote não elimina validação humana. Pagamento/custos individuais ficam F3.
+T08 compara coorte/prazo/volume equivalentes no manual e sistema; se modo manual for validado, medir e declarar explicitamente que leitura automática continua bloqueada. Real só com política/guarda aprovadas. Sem promessa automática de reduzir equipe ou concluir em 2 meses.
+
